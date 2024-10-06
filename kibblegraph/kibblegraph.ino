@@ -29,11 +29,7 @@ int32_t weightLastStable;
 
 void setup() {
 
-  #ifdef SHOW_SERIAL
-    Serial.begin(115200);
-    delay(1000);
-    Serial.println(F("Hello world"));
-  #endif
+  Serial.begin(115200);
 
   #ifdef ENABLE_NEOPIXEL
     #if defined(NEOPIXEL_POWER)
@@ -56,17 +52,13 @@ void setup() {
   delay(10000); //gives a chance to upload new sketch before it sleeps
 
   if (! nau.begin()) {
-    #ifdef SHOW_SERIAL
-      Serial.println("Failed to find NAU7802");
-    #endif
+    Serial.println("Failed to find NAU7802");
     #ifdef ENABLE_NEOPIXEL
       pixels.fill(0xFF0000);
       pixels.show();
     #endif
   } else {
-    #ifdef SHOW_SERIAL
-      Serial.println("Found NAU7802");
-    #endif
+    Serial.println("Found NAU7802");
     nauOK = true;
     //https://github.com/adafruit/Adafruit_NAU7802/blob/master/examples/nau7802_test/nau7802_test.ino
     nau.setLDO(NAU7802_3V0);
@@ -107,12 +99,10 @@ void loop() {
       int32_t weightNow = nau.read();
       // int32_t weightNow = millis()/10000;
 
-      #ifdef SHOW_SERIAL
       Serial.print(weightNow,DEC);
       Serial.print(F(" -> "));
-      Serial.println(weightNow*WEIGHT_SCALING,DEC);
-      #endif
-
+      Serial.println(weightNow/WEIGHT_DIVIDE,DEC);
+      
       int32_t weightDiff = weightNow-weightLast;
 
       if(weightLast==weightLastStable && abs(weightDiff) >= WEIGHT_TOLERANCE) { //check for instability
@@ -127,7 +117,7 @@ void loop() {
         weightLast = weightNow;
         weightLastStable = weightNow;
         Serial.print(F("Stable! Weight change: "));
-        Serial.println(weightDiff*WEIGHT_SCALING,DEC);
+        Serial.println(weightDiff/WEIGHT_DIVIDE,DEC);
         #ifdef ENABLE_NEOPIXEL
           pixels.fill(0x000000);
           pixels.show();
@@ -138,10 +128,8 @@ void loop() {
       if(weightDiff!=0) { //if the weight differed enough to matter, send info
         //Start wifi
         for(int attempts=0; attempts<3; attempts++) {
-          #ifdef SHOW_SERIAL
-            Serial.print(F("\nConnecting to WiFi SSID "));
-            Serial.println(NETWORK_SSID);
-          #endif
+          Serial.print(F("\nConnecting to WiFi SSID "));
+          Serial.println(NETWORK_SSID);
           WiFi.begin(NETWORK_SSID, NETWORK_PASS);
           int timeout = 0;
           while(WiFi.status()!=WL_CONNECTED && timeout<15) {
@@ -152,19 +140,15 @@ void loop() {
               pixels.fill(0x0000FF); //blue - wifi success
               pixels.show();
             #endif
-            #ifdef SHOW_SERIAL
-              Serial.println(F("Connected!"));
-              //Serial.print(F("SSID: ")); Serial.println(WiFi.SSID());
-              Serial.print(F("Signal strength (RSSI): ")); Serial.print(WiFi.RSSI()); Serial.println(F(" dBm"));
-              Serial.print(F("Local IP: ")); Serial.println(WiFi.localIP());
-            #endif
+            Serial.println(F("Connected!"));
+            //Serial.print(F("SSID: ")); Serial.println(WiFi.SSID());
+            Serial.print(F("Signal strength (RSSI): ")); Serial.print(WiFi.RSSI()); Serial.println(F(" dBm"));
+            Serial.print(F("Local IP: ")); Serial.println(WiFi.localIP());
             break; //leave attempts loop
           }
         }
         if(WiFi.status()!=WL_CONNECTED) {
-          #ifdef SHOW_SERIAL
-            Serial.println(F("Wasn't able to connect."));
-          #endif
+          Serial.println(F("Wasn't able to connect."));
           #ifdef ENABLE_NEOPIXEL
             pixels.fill(0xFF0000); //red - no wifi success
             pixels.show();
@@ -180,17 +164,13 @@ void loop() {
         HTTPClient http;
         int httpReturnCode;
         for(int attempts=0; attempts<3; attempts++) {
-          #ifdef SHOW_SERIAL
-            Serial.print(F("\nSending to log, attempt "));
-            Serial.println(attempts,DEC);
-          #endif
+          Serial.print(F("\nSending to log, attempt "));
+          Serial.println(attempts,DEC);
           unsigned long offset = millis()-millisStart;
           http.begin(String(LOG_URL)+"&offset="+String(offset));
           httpReturnCode = http.GET();
           if(httpReturnCode==200) {
-            #ifdef SHOW_SERIAL
-              Serial.println(F("Successful!"));
-            #endif
+            Serial.println(F("Successful!"));
             #ifdef ENABLE_NEOPIXEL
               pixels.fill(0x00FF00); //green - log success
               pixels.show();
@@ -200,10 +180,8 @@ void loop() {
           }
         }
         if(httpReturnCode!=200) {
-          #ifdef SHOW_SERIAL
-            Serial.print(F("Not successful. Last HTTP code: "));
-            Serial.println(httpReturnCode,DEC);
-          #endif
+          Serial.print(F("Not successful. Last HTTP code: "));
+          Serial.println(httpReturnCode,DEC);
           #ifdef ENABLE_NEOPIXEL
             pixels.fill(0xFF0000); //red - log failure
             pixels.show();

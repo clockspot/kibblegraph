@@ -1,7 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define SHOW_SERIAL
 #define ENABLE_NEOPIXEL
 #define Wire Wire1 //If using Adafruit QT Py ESP32, with all the I2C stuff connected to the QT port (Wire1) rather than the pins (Wire) - TODO will this mess up your use of the regular Wire pins for other purposes?
 
@@ -25,8 +24,8 @@
 #define CONFIRM_INTERVAL_MS 30000 //When unstable, resample at this rate to confirm stability (cat has stopped eating). E.g. 30000
 //If doing calibration via serial, change these to e.g. 1000
 
-#define WEIGHT_TOLERANCE 2 //The weight difference (in strain gauge units) required to trigger instability/determine stability
-#define WEIGHT_SCALING 1.25 //To convert from strain gauge units to grams
+#define WEIGHT_TOLERANCE 100 //The weight difference (in strain gauge units) required to trigger instability/determine stability
+#define WEIGHT_DIVIDE 100 //To convert from strain gauge units (hundredths of a gram?) to grams
 
 // #define NTP_HOST "pool.ntp.org"
 //#define TZ_OFFSET_SEC -21600 //will go at midnight in this time zone
