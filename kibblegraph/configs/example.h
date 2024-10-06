@@ -1,8 +1,9 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-//#define SHOW_SERIAL
+#define SHOW_SERIAL
 #define ENABLE_NEOPIXEL
+#define Wire Wire1 //If using Adafruit QT Py ESP32, with all the I2C stuff connected to the QT port (Wire1) rather than the pins (Wire) - TODO will this mess up your use of the regular Wire pins for other purposes?
 
 //pins expressed in gpio_num_t format
 // #define BATTERY_MONITOR_PIN GPIO_NUM_9 //A2, when QT Py is equipped with LiPo BFF

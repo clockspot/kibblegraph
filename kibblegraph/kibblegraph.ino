@@ -4,6 +4,7 @@
 // Sketch by Luke McKenzie (luke@theclockspot.com)
 
 #include <arduino.h>
+#include <Wire.h>
 #include "kibblegraph.h" //specifies config
 //#include "esp_sleep.h" //for future low-power support - see flipflop-clock-advancer
 
@@ -49,6 +50,8 @@ void setup() {
     pixels.show();
   #endif
 
+  Wire.begin();
+
   //remove when adding future low-power support
   delay(10000); //gives a chance to upload new sketch before it sleeps
 
@@ -92,7 +95,7 @@ void setup() {
 } //end setup()
 
 void loop() {
-  // if(!nauOK) return;
+  if(!nauOK) return;
   
   unsigned long sampleNow = millis();
 
@@ -100,9 +103,9 @@ void loop() {
 
       sampleLast = sampleNow;
 
-      // while (! nau.available()) delay(1);
-      // int32_t weightNow = nau.read();
-      int32_t weightNow = millis()/10000;
+      while (! nau.available()) delay(1);
+      int32_t weightNow = nau.read();
+      // int32_t weightNow = millis()/10000;
 
       #ifdef SHOW_SERIAL
       Serial.print(weightNow,DEC);
